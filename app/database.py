@@ -1,14 +1,20 @@
+# app/database.py
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
-from app.core.config import settings
+from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+import os
 
-engine = create_engine(settings.DATABASE_URL, echo=False, future=True)
+load_dotenv() # 환경 변수 로드 (로컬 개발 시)
 
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+# Render 환경 변수에서 DB 연결 문자열을 불러옵니다.
+DATABASE_URL = os.getenv("DATABASE_URL")
+# 예: "postgresql://[USER]:[PASSWORD]@[HOST]:[PORT]/[DATABASE_NAME]"
 
-class Base(DeclarativeBase):
-    pass
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Dependency (의존성) 함수
 def get_db():
     db = SessionLocal()
     try:
